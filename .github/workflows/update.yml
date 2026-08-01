@@ -29,7 +29,7 @@ jobs:
 
     steps:
       - name: Check out packaging repository
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Install packaging tools
         run: dnf install -y copr-cli coreutils curl git jq rpm-build
@@ -50,7 +50,6 @@ jobs:
         if: >-
           steps.stable.outputs.changed == 'true' ||
           steps.nightly.outputs.changed == 'true' ||
-          github.event_name == 'push' ||
           inputs.rebuild == true
         env:
           COPR_CONFIG: ${{ secrets.COPR_CONFIG }}
@@ -64,7 +63,6 @@ jobs:
       - name: Build stable package
         if: >-
           steps.stable.outputs.changed == 'true' ||
-          github.event_name == 'push' ||
           inputs.rebuild == true
         env:
           COPR_PROJECT: ${{ vars.COPR_STABLE_PROJECT || 'ponesicek/t3code-bin' }}
@@ -73,7 +71,6 @@ jobs:
       - name: Build nightly package
         if: >-
           steps.nightly.outputs.changed == 'true' ||
-          github.event_name == 'push' ||
           inputs.rebuild == true
         env:
           COPR_PROJECT: ${{ vars.COPR_NIGHTLY_PROJECT || 'ponesicek/t3code-nightly-bin' }}
