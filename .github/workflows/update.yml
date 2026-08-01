@@ -1,0 +1,94 @@
+name: Update from upstream
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/update.yml"
+      - "scripts/update-spec.sh"
+  schedule:
+    - cron: "17 */6 * * *"
+  workflow_dispatch:
+    inputs:
+      rebuild:
+        description: Build even when both specs are current
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-from-upstream
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    container: fedora:44
+
+    steps:
+      - name: Check out packaging repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Install packaging tools
+        run: dnf install -y copr-cli coreutils curl git jq rpm-build
+
+      - name: Resolve latest stable release
+        id: stable
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: ./scripts/update-spec.sh stable t3code-bin.spec
+
+      - name: Resolve latest nightly release
+        id: nightly
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: ./scripts/update-spec.sh nightly t3code-nightly-bin.spec
+
+      - name: Configure COPR authentication
+        if: >-
+          steps.stable.outputs.changed == 'true' ||
+          steps.nightly.outputs.changed == 'true' ||
+          github.event_name == 'push' ||
+          inputs.rebuild == true
+        env:
+          COPR_CONFIG: ${{ secrets.COPR_CONFIG }}
+        run: |
+          set -euo pipefail
+          [[ -n $COPR_CONFIG ]] || { echo 'COPR_CONFIG secret is not configured' >&2; exit 1; }
+          install -d -m 0700 ~/.config
+          printf '%s' "$COPR_CONFIG" > ~/.config/copr
+          chmod 0600 ~/.config/copr
+
+      - name: Build stable package
+        if: >-
+          steps.stable.outputs.changed == 'true' ||
+          github.event_name == 'push' ||
+          inputs.rebuild == true
+        env:
+          COPR_PROJECT: ${{ vars.COPR_STABLE_PROJECT || 'ponesicek/t3code-bin' }}
+        run: ./scripts/build-and-submit.sh t3code-bin.spec "$COPR_PROJECT"
+
+      - name: Build nightly package
+        if: >-
+          steps.nightly.outputs.changed == 'true' ||
+          github.event_name == 'push' ||
+          inputs.rebuild == true
+        env:
+          COPR_PROJECT: ${{ vars.COPR_NIGHTLY_PROJECT || 'ponesicek/t3code-nightly-bin' }}
+        run: ./scripts/build-and-submit.sh t3code-nightly-bin.spec "$COPR_PROJECT"
+
+      - name: Commit packaged versions
+        if: steps.stable.outputs.changed == 'true' || steps.nightly.outputs.changed == 'true'
+        env:
+          STABLE_TAG: ${{ steps.stable.outputs.tag }}
+          NIGHTLY_TAG: ${{ steps.nightly.outputs.tag }}
+        run: |
+          set -euo pipefail
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add t3code-bin.spec t3code-nightly-bin.spec
+          git commit -m "chore: package T3 Code $STABLE_TAG / $NIGHTLY_TAG"
+          git push
