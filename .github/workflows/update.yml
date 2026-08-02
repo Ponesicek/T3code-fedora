@@ -28,11 +28,11 @@ jobs:
     container: fedora:44
 
     steps:
-      - name: Check out packaging repository
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-
       - name: Install packaging tools
         run: dnf install -y copr-cli coreutils curl git jq rpm-build
+
+      - name: Check out packaging repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Resolve latest stable release
         id: stable
