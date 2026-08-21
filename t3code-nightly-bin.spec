@@ -1,10 +1,10 @@
-%global upstream_version 0.0.34-nightly.20260821.1147
+%global upstream_version 0.0.34-nightly.20260821.1149
 %global upstream_tag v%{upstream_version}
-%global source0_sha256 d45cd2c1bc82db19ad2c39fc6d2a9ecc7e245c2474e05d1cb2632c5b6f40a803
+%global source0_sha256 cf8d15c7355fa6233677fe03db7a36e3019d46619b453d5a20192bf2323c73ec
 %global source1_sha256 935d8f2af0c703f9c39517ee57cc4930b19d02d533be930b63f0e82f93614b43
 
 Name:           t3code-nightly-bin
-Version:        0.0.34~nightly.20260821.1147
+Version:        0.0.34~nightly.20260821.1149
 Release:        1%{?dist}
 Summary:        Nightly GUI for coding agents (upstream binary package)
 
@@ -120,6 +120,8 @@ install -Dpm 0644 %{SOURCE1} %{buildroot}%{_licensedir}/%{name}/LICENSE
 
 
 %changelog
+* Fri Aug 21 2026 Ponesicek <ponesicek@users.noreply.github.com> - 0.0.34~nightly.20260821.1149-1
+- Package upstream T3 Code 0.0.34-nightly.20260821.1149 binary release
 * Fri Aug 21 2026 Ponesicek <ponesicek@users.noreply.github.com> - 0.0.34~nightly.20260821.1147-1
 - Package upstream T3 Code 0.0.34-nightly.20260821.1147 binary release
 * Thu Aug 20 2026 Ponesicek <ponesicek@users.noreply.github.com> - 0.0.34~nightly.20260820.1142-1
