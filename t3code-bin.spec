@@ -1,10 +1,10 @@
-%global upstream_version 0.0.38
+%global upstream_version 0.0.39
 %global upstream_tag v%{upstream_version}
-%global source0_sha256 1f1ccd922b2efaffd50447b028ee0d6e2525502905087cf8ae3fe41efebe346f
+%global source0_sha256 4f78c9939c0386f9be5a2d8e9baf9644af497344015817a36fea8be84981bda8
 %global source1_sha256 935d8f2af0c703f9c39517ee57cc4930b19d02d533be930b63f0e82f93614b43
 
 Name:           t3code-bin
-Version:        0.0.38
+Version:        0.0.39
 Release:        1%{?dist}
 Summary:        GUI for coding agents (upstream binary package)
 
@@ -120,6 +120,8 @@ install -Dpm 0644 %{SOURCE1} %{buildroot}%{_licensedir}/%{name}/LICENSE
 
 
 %changelog
+* Mon Sep 07 2026 Ponesicek <ponesicek@users.noreply.github.com> - 0.0.39-1
+- Package upstream T3 Code 0.0.39 binary release
 * Wed Sep 02 2026 Ponesicek <ponesicek@users.noreply.github.com> - 0.0.38-1
 - Package upstream T3 Code 0.0.38 binary release
 * Mon Aug 31 2026 Ponesicek <ponesicek@users.noreply.github.com> - 0.0.37-1
